@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>maplibre-gl-polygon-patterns demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #0e1210;
+      }
+      #map {
+        position: absolute;
+        inset: 0;
+      }
+
+      .header {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 13px;
+        pointer-events: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .header-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .header-top h1 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #16150f;
+        margin: 0;
+      }
+      .header-top .desc {
+        color: #64748b;
+        font-size: 13px;
+      }
+      .header-author {
+        font-size: 11px;
+        color: #94a3b8;
+      }
+      .header-author a {
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .header-author a:hover {
+        color: #16150f;
+      }
+      .header-bottom {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      .header .badges {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+      .header .badges img {
+        height: 20px;
+        display: block;
+      }
+      .header .btns {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+      }
+      @media (max-width: 374px) {
+        .header .btns {
+          margin-left: 0;
+          width: 100%;
+          flex-direction: column;
+        }
+        .header .btns a {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      .header .btns a {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: 1.5px solid;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .header .btns a.btn-github {
+        border-color: #d1d5db;
+        color: #374151;
+        background: transparent;
+      }
+      .header .btns a.btn-github:hover {
+        background: #f3f4f6;
+      }
+      .header .btns a.btn-npm {
+        border-color: #d1d5db;
+        color: #374151;
+        background: transparent;
+      }
+      .header .btns a.btn-npm:hover {
+        background: #f3f4f6;
+      }
+      .header .btns button.btn-regen {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: 1.5px solid #c65b2e;
+        font-size: 13px;
+        font-weight: 500;
+        background: transparent;
+        color: #c65b2e;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .header .btns button.btn-regen:hover {
+        background: #c65b2e;
+        color: #fff;
+      }
+      @media (max-width: 374px) {
+        .header .btns a {
+          font-size: 12px;
+          padding: 5px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <div class="header">
+      <div class="header-top">
+        <h1>maplibre-gl-polygon-patterns</h1>
+        <span class="desc">SVG hatch patterns via textures.js for MapLibre GL polygons</span>
+      </div>
+      <div class="header-author">by <a href="https://leoneljdias.pt">leoneljdias</a></div>
+      <div class="header-bottom">
+        <span class="badges">
+          <img
+            src="https://img.shields.io/npm/v/@leoneljdias/maplibre-gl-polygon-patterns?color=2563eb"
+            alt="v1.0.0"
+          />
+          <img src="https://img.shields.io/badge/MIT-6b7280" alt="MIT" />
+          <img
+            src="https://img.shields.io/bundlephobia/min/@leoneljdias/maplibre-gl-polygon-patterns?color=6b7280"
+            alt="bundle size"
+          />
+        </span>
+        <span class="btns">
+          <button class="btn-regen" id="regen-btn">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
+            Regenerate
+          </button>
+          <a class="btn-github" href="https://github.com/leoneljdias/maplibre-gl-polygon-patterns">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
+            </svg>
+            GitHub
+          </a>
+          <a
+            class="btn-npm"
+            href="https://www.npmjs.com/package/@leoneljdias/maplibre-gl-polygon-patterns"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+              />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+            npm
+          </a>
+        </span>
+      </div>
+    </div>
+
+    <script src="../dist/index.umd.js"></script>
+    <script src="countries.js"></script>
+    <script>
+      /* ── Random mode: assign patterns + colours to every polygon ──────
+       *
+       *   1. Pick your pattern IDs and colours
+       *   2. (Optional) Run colorize() so adjacent polygons get different
+       *      patterns — ported from geoglify.com
+       *   3. Set geoglify:patternEnabled, :patternId, :patternColor,
+       *      :patternOpacity on each feature's properties
+       *   4. Call patterns.ensure(id, colour) for each unique combo
+       *   5. Use buildFillPatternExpr() / buildFillOpacityExpr() in layers
+       *
+       * That's it — the plugin handles SVG → canvas → map.addImage().
+       * ──────────────────────────────────────────────────────────────── */
+
+      // ── 1. Choose colours & patterns ─────────────────────────────────
+      var COLORS = [
+        "#2563eb",
+        "#dc2626",
+        "#16a34a",
+        "#d97706",
+        "#9333ea",
+        "#db2777",
+        "#0d9488",
+        "#ca8a04",
+        "#0891b2",
+        "#7c3aed",
+        "#ea580c",
+        "#be123c",
+      ];
+
+      // ── 1. (cont.) Patterns (all 28 from the plugin) ─────────────────
+      var PATTERN_IDS = [
+        "lines-default",
+        "lines-heavier",
+        "lines-lighter",
+        "lines-thicker",
+        "lines-thinner",
+        "lines-heavy-thin",
+        "lines-tiny",
+        "lines-small",
+        "lines-vertical-crisp",
+        "lines-steep",
+        "lines-crossed",
+        "lines-grid-crisp",
+        "circles-default",
+        "circles-heavier",
+        "circles-lighter",
+        "circles-thicker",
+        "circles-thinner",
+        "circles-size5",
+        "circles-radius4",
+        "circles-radius4-thin",
+        "circles-small-fill",
+        "paths-hexagons",
+        "paths-crosses",
+        "paths-caps",
+        "paths-woven",
+        "paths-waves",
+        "paths-nylon",
+        "paths-squares",
+      ];
+
+      // ── Map + Plugin ─────────────────────────────────────────────────
+      var map = new maplibregl.Map({
+        container: "map",
+        style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+        center: [0, 20],
+        zoom: 1.5,
+      });
+
+      var patterns = new maplibregl.PolygonPatterns(map, {
+        prewarmOnLoad: false,
+      });
+
+      function applyRandomPatterns() {
+        // COUNTRIES is loaded from countries.js (world countries GeoJSON)
+        var features = COUNTRIES.features;
+        features.forEach(function (f, i) {
+          f.id = f.properties.iso_a3 || f.properties.adm0_a3 || i;
+        });
+
+        // ── 2. Colorize: assign distinct patterns to adjacent polygons ───
+        var assignment = maplibregl.PolygonPatterns.colorize(
+          features.map(function (f) {
+            return { id: f.id, coordinates: f.geometry.coordinates };
+          }),
+          PATTERN_IDS,
+        );
+
+        var assignmentMap = {};
+        assignment.forEach(function (a) {
+          assignmentMap[a.id] = a.patternId;
+        });
+
+        // ── 3. Set geoglify:* properties on each feature ────────────
+        var needed = new Map();
+        features.forEach(function (f) {
+          var pid = assignmentMap[f.id];
+          var color = COLORS[(Math.random() * COLORS.length) | 0];
+
+          f.properties["geoglify:patternEnabled"] = true;
+          f.properties["geoglify:patternId"] = pid;
+          f.properties["geoglify:patternColor"] = color.replace("#", "");
+          f.properties["geoglify:patternOpacity"] = (Math.random() * 40 + 60) | 0;
+
+          var key = pid + "-" + color;
+          if (!needed.has(key)) needed.set(key, { patternId: pid, color: color });
+        });
+
+        // ── 4. Generate & register all required pattern images ──────
+        var promises = Array.from(needed.values()).map(function (inst) {
+          return patterns.ensure(inst.patternId, inst.color);
+        });
+
+        // ── 5. Update the source so the map re-renders ──────────────
+        return Promise.all(promises).then(function () {
+          if (map.getSource("countries")) {
+            map.getSource("countries").setData({ type: "FeatureCollection", features: features });
+          } else {
+            map.addSource("countries", {
+              type: "geojson",
+              data: { type: "FeatureCollection", features: features },
+            });
+
+            map.addLayer({
+              id: "countries-fill",
+              type: "fill",
+              source: "countries",
+              paint: {
+                "fill-pattern": patterns.buildFillPatternExpr(),
+                "fill-opacity": patterns.buildFillOpacityExpr(0.85),
+              },
+            });
+
+            map.addLayer({
+              id: "countries-stroke",
+              type: "line",
+              source: "countries",
+              paint: {
+                "line-color": "#ffffff",
+                "line-width": 1,
+                "line-opacity": 0.5,
+              },
+            });
+          }
+        });
+      }
+
+      map.on("load", function () {
+        // Hide basemap labels so patterns are the focus
+        map.getStyle().layers.forEach(function (l) {
+          if (l.layout && l.layout["text-field"]) {
+            map.setLayoutProperty(l.id, "visibility", "none");
+          }
+        });
+        applyRandomPatterns();
+      });
+
+      document.getElementById("regen-btn").addEventListener("click", function () {
+        this.disabled = true;
+        this.textContent = "Regenerating…";
+        applyRandomPatterns().then(
+          function () {
+            this.disabled = false;
+            this.innerHTML =
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg> Regenerate';
+          }.bind(this),
+        );
+      });
+    </script>
+  </body>
+</html>

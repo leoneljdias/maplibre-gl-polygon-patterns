@@ -1,0 +1,58 @@
+{
+  "name": "@leoneljdias/maplibre-gl-polygon-patterns",
+  "version": "1.0.0",
+  "description": "SVG hatch/fill patterns for MapLibre GL JS polygons using fill-pattern",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/index.umd.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "maplibre-gl": ">=3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15",
+    "d3-selection": "^3",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.5",
+    "rollup": "^4",
+    "textures": "^1.2.3"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "format": "prettier --write src/ demo/ *.md *.json",
+    "format:check": "prettier --check src/ demo/ *.md *.json",
+    "prepare": "husky",
+    "prepublishOnly": "npm run build"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,json,md,html}": "prettier --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leoneljdias/maplibre-gl-polygon-patterns.git"
+  },
+  "homepage": "https://leoneljdias.github.io/maplibre-gl-polygon-patterns/demo/",
+  "bugs": {
+    "url": "https://github.com/leoneljdias/maplibre-gl-polygon-patterns/issues"
+  },
+  "keywords": [
+    "maplibre",
+    "maplibre-gl",
+    "polygon",
+    "pattern",
+    "hatch",
+    "fill",
+    "texture"
+  ],
+  "license": "MIT"
+}
